@@ -1,0 +1,106 @@
+array:
+.word   7, 2, 1,9,10,11,12, 6, 8, 5, 3, 4
+
+array_size: 
+.word   12
+
+.global _start
+.balign 4
+_start:
+	LDR R0, =array
+    mov R1, #0
+    ldr R2, =array_size
+	ldr r2,[r2]
+	sub r2, r2,#1
+	
+	Bl _quickSort
+	here: b here
+	
+	
+	
+	
+_partition:
+	push {lr,r4,r5,r6,r7}
+
+	ldr r3,[r0,r2,lsl #2]
+	sub r4,r1,#1
+	mov r5,r1
+	
+for: cmp r5,r3
+	Bgt endfor
+	
+	ldr r6,[r0,r5,lsl #2]
+	
+	cmp r6,r3
+	bge endif
+	
+	add r4,r4,#1
+	
+	ldr r6,[r0,r5,lsl #2]
+	ldr r7,[r0,r4,lsl #2]
+	
+	
+	@swap
+	str r7,[r0,r5,lsl #2]
+	str r6,[r0,r4,lsl #2]
+	
+endif:
+
+
+	add r5,r5,#1
+	b for
+endfor:	
+	ldr r6,[r0,r2,lsl #2]
+	add r4,r4,#1
+	ldr r7,[r0,r4,lsl #2]
+	
+	@swap
+	str r7,[r0,r2,lsl #2]
+	str r6,[r0,r4,lsl #2]
+	
+	mov r0,r4
+	pop {lr,r4,r5,r6,r7}
+	bx lr
+	
+	
+	
+	
+	
+	
+	
+_quickSort:
+	push {lr}
+	cmp r1,r2
+	bge endq
+	
+	push {r0,r1,r2}
+	
+	bl _partition
+	mov r3, r0
+	
+	pop {r0,r1,r2}
+	push  {r0,r1,r2,r3}
+	
+	sub r3,r3,#1
+	
+	push {r3}
+	
+	mov r2,r3
+	Bl _quickSort
+	pop {r0,r1,r2,r3}
+	
+	push {r0,r1,r2,r3}
+	
+	add r3,r3,#1
+	
+	push {r3}
+	
+	mov r1,r3
+	Bl _quickSort
+	
+	pop {r0,r1,r2,r3}
+	
+	b endq
+endq:
+	pop {lr}
+	bx lr
